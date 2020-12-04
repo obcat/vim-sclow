@@ -36,7 +36,7 @@ COMMANDS                                                      *sclow-commands*
 ==============================================================================
 HIGHLIGHTS                                                  *sclow-highlights*
 
-SclowSbar (default: links to |hi-Pmenu|)                        *hl-SclowSbar*
+SclowSbar (default: links to |hl-Pmenu|)                        *hl-SclowSbar*
     Highlight group for scrollbar which |Sclow| generates.
 
 
@@ -76,7 +76,7 @@ OPTIONS                                                        *sclow-options*
     Use |regexp| to specify the pattern. Empty string means non-blocking.
     Example:
 >
-    let g:sclow_block_buftypes = '\(terminal|prompt\)'
+    let g:sclow_block_buftypes = '\(terminal\|prompt\)'
 <
     NOTE: The matching is executed with |expr-=~|.
 
