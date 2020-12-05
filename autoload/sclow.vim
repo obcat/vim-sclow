@@ -272,6 +272,11 @@ function! sclow#delete() abort
   endif
 
   if s:sbar_exists()
-    call popup_close(w:sclow_sbar_id)
+    call s:delete_sbar()
   endif
+endfunction
+
+
+function! s:delete_sbar() abort
+  call popup_close(w:sclow_sbar_id)
 endfunction
