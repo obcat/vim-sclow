@@ -201,10 +201,12 @@ endfunction
 
 
 function! s:update_sbar() abort
+  let l:pos = popup_getpos(w:sclow_sbar_id)
+
   let [l:line, l:col] = win_screenpos(0)
   let l:col += winwidth(0) - 1
 
-  if !popup_locate(l:line, l:col)
+  if [l:pos.line, l:pos.col] != [l:line, l:col]
     call s:move_sbar_base(l:line, l:col)
   endif
 
