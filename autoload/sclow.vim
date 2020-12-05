@@ -265,7 +265,7 @@ endfunction
 
 
 " This function is called on BufLeave and WinLeave
-function! sclow#clean() abort
+function! sclow#delete() abort
   " Avoid E994 (cf. https://github.com/obcat/vim-hitspop/issues/5)
   if win_gettype() == 'popup'
     return

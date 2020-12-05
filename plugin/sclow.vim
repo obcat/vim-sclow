@@ -11,12 +11,12 @@ function! s:register_autocmds() abort
     autocmd!
     autocmd BufEnter,WinEnter * call sclow#create()
     autocmd CursorMoved,CursorMovedI,CursorHold * call sclow#update()
-    autocmd BufLeave,WinLeave * call sclow#clean()
+    autocmd BufLeave,WinLeave * call sclow#delete()
   augroup END
 endfunction
 
 command! SclowEnable  call s:gister_autocmds()
-command! SclowDisable call sclow#clean() | autocmd! sclow-autocmds
+command! SclowDisable call sclow#delete() | autocmd! sclow-autocmds
 
 call s:register_autocmds()
 
