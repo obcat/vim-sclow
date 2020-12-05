@@ -9,7 +9,8 @@ endif
 function! s:register_autocmds() abort
   augroup sclow-autocmds
     autocmd!
-    autocmd CursorMoved,CursorMovedI,CursorHold,BufEnter * call sclow#main()
+    autocmd BufEnter,WinEnter * call sclow#create()
+    autocmd CursorMoved,CursorMovedI,CursorHold * call sclow#update()
     autocmd BufLeave,WinLeave * call sclow#clean()
   augroup END
 endfunction

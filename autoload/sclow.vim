@@ -18,23 +18,22 @@ endfunction
 call s:init()
 
 
-" This function is called every time CursorMoved, CursorMovedI, CursorHold, and
-" BufEnter.
-function! sclow#main() abort
-  " Avoid E994 (cf. https://github.com/obcat/vim-hitspop/issues/5)
-  if win_gettype() == 'popup'
+" This function is called on BufEnter and WinEnter
+function! sclow#create() abort
+  if get(b:, 'sclow_is_blocked')
     return
   endif
 
   if s:is_blocked()
+    let b:sclow_is_blocked = 1
     return
   endif
 
-  if !s:sbar_exists()
-    call s:create_sbar()
-  else
-    call s:update_sbar()
+  if s:sbar_exists()
+    return
   endif
+
+  call s:create_sbar()
 
   call s:save_info()
 endfunction
@@ -44,6 +43,18 @@ function! s:is_blocked() abort
   return (!empty(s:block_filetypes) && &l:filetype  =~ s:block_filetypes)
     \ || (!empty(s:block_bufnames)  && bufname('%') =~ s:block_bufnames)
     \ || (!empty(s:block_buftypes)  && &l:buftype   =~ s:block_buftypes)
+endfunction
+
+
+" This function is called on CursorMoved, CursorMovedI, and CursorHold
+function! sclow#update() abort
+  if !s:sbar_exists()
+    return
+  endif
+
+  call s:update_sbar()
+
+  call s:save_info()
 endfunction
 
 
@@ -253,13 +264,10 @@ function! s:save_info() abort
 endfunction
 
 
+" This function is called on BufLeave and WinLeave
 function! sclow#clean() abort
   " Avoid E994 (cf. https://github.com/obcat/vim-hitspop/issues/5)
   if win_gettype() == 'popup'
-    return
-  endif
-
-  if s:is_blocked()
     return
   endif
 
