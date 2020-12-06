@@ -57,7 +57,7 @@ function! s:init()
   let s:hide_full_length = get(g:, 'sclow_hide_full_length', 0)
   hi default link SclowSbar Pmenu
 
-  let s:sbar_width = strlen(s:sbar_text)
+  let s:sbar_width = strwidth(s:sbar_text)
 endfunction
 
 
