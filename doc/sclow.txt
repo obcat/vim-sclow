@@ -52,25 +52,17 @@ OPTIONS                                                        *sclow-options*
     value is 32000.
 
 
-*g:sclow_block_filetypes* (default: '')
-    Specify the filetype of buffer that does not show the scrollbar. Use
-    |regexp| to specify the pattern. Empty string means non-blocking. Example:
+*g:sclow_block_filetypes* (default: [])
+    List of filetypes that do not show the scrollbar. Example:
 >
-    let g:sclow_block_filetypes = '\(netrw\|nerdtree\)'
+    let g:sclow_block_filetypes = ['netrw', 'nerdtree']
 <
-    NOTE: The matching is executed with |expr-=~|.
 
-
-*g:sclow_block_buftypes* (default: '')
-
-    Specify the type of buffer ('buftype') that does not show the scrollbar.
-    Use |regexp| to specify the pattern. Empty string means non-blocking.
-    Example:
+*g:sclow_block_buftypes* (default: [])
+    List of buftypes (see 'buftype') that do not show the scrollbar. Example:
 >
-    let g:sclow_block_buftypes = '\(terminal\|prompt\)'
+    let g:sclow_block_buftypes = ['terminal', 'prompt']
 <
-    NOTE: The matching is executed with |expr-=~|.
-
 
 *g:sclow_show_full_length_sbar* (default: 1)
     Determine whether or not to show full-length scrollbar when both the first

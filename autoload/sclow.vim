@@ -3,8 +3,8 @@
 
 
 function! s:init()
-  let s:block_filetypes = get(g:, 'sclow_block_filetypes', '')
-  let s:block_buftypes  = get(g:, 'sclow_block_buftypes', '')
+  let s:block_filetypes = get(g:, 'sclow_block_filetypes', [])
+  let s:block_buftypes  = get(g:, 'sclow_block_buftypes', [])
   let s:sbar_text   = get(g:, 'sclow_sbar_text', "\<Space>")
   let s:sbar_zindex = get(g:, 'sclow_sbar_zindex', 20)
   let s:show_full_length_sbar = get(g:, 'sclow_show_full_length_sbar', 1)
@@ -39,8 +39,8 @@ endfunction
 
 
 function! s:is_blocked() abort
-  return (!empty(s:block_filetypes) && &l:filetype  =~ s:block_filetypes)
-    \ || (!empty(s:block_buftypes)  && &l:buftype   =~ s:block_buftypes)
+  return index(s:block_filetypes, &l:filetype) >= 0
+    \ || index(s:block_buftypes,  &l:buftype)  >= 0
 endfunction
 
 
