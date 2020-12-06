@@ -61,15 +61,6 @@ OPTIONS                                                        *sclow-options*
     NOTE: The matching is executed with |expr-=~|.
 
 
-*g:sclow_block_bufnames* (default: '')
-    Specify the name of buffer that does not show the scrollbar. Use |regexp|
-    to specify the pattern. Empty string means non-blocking. Example:
->
-    (I cannot think of a good example :p)
-<
-    NOTE: The matching is executed with |expr-=~|.
-
-
 *g:sclow_block_buftypes* (default: '')
 
     Specify the type of buffer ('buftype') that does not show the scrollbar.

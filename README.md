@@ -72,7 +72,6 @@ highlight SclowSbar ctermbg=NONE guibg=NONE
 If you don't want to see the scrollbar in a specific buffer, you can use:
 
 * `g:sclow_block_filetypes` (default: `''`)
-* `g:sclow_block_bufnames` (default: `''`)
 * `g:sclow_block_buftypes` (default: `''`)
 
 Use regular expression to specify the pattern. Empty string means non-blocking.

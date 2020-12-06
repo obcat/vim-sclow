@@ -4,7 +4,6 @@
 
 function! s:init()
   let s:block_filetypes = get(g:, 'sclow_block_filetypes', '')
-  let s:block_bufnames  = get(g:, 'sclow_block_bufnames', '')
   let s:block_buftypes  = get(g:, 'sclow_block_buftypes', '')
   let s:sbar_text   = get(g:, 'sclow_sbar_text', "\<Space>")
   let s:sbar_zindex = get(g:, 'sclow_sbar_zindex', 20)
@@ -41,7 +40,6 @@ endfunction
 
 function! s:is_blocked() abort
   return (!empty(s:block_filetypes) && &l:filetype  =~ s:block_filetypes)
-    \ || (!empty(s:block_bufnames)  && bufname('%') =~ s:block_bufnames)
     \ || (!empty(s:block_buftypes)  && &l:buftype   =~ s:block_buftypes)
 endfunction
 
