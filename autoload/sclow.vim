@@ -258,7 +258,6 @@ endfunction
 
 function! s:update_sbar() abort
   let l:pos = popup_getpos(w:sclow_sbar_id)
-
   let [l:line, l:col] = win_screenpos(0)
   let l:col += winwidth(0) - 1
 
@@ -266,8 +265,11 @@ function! s:update_sbar() abort
     call s:move_sbar_base(l:line, l:col)
   endif
 
-  if s:winheight_changed()
-    call s:update_sbar_base()
+  let l:win_height  = winheight(0)
+  let l:base_height = winheight(w:sclow_sbar_id)
+
+  if l:base_height != l:win_height
+    call s:update_base_height(l:win_height)
   endif
 
   if s:scrolled()
@@ -281,13 +283,8 @@ function! s:move_sbar_base(line, col) abort
 endfunction
 
 
-function! s:winheight_changed() abort
-  return w:sclow_saved_winheight != winheight(0)
-endfunction
-
-
-function! s:update_sbar_base() abort
-  call popup_settext(w:sclow_sbar_id, repeat([s:sbar_text], winheight(0)))
+function! s:update_base_height(height) abort
+  call popup_settext(w:sclow_sbar_id, repeat([s:sbar_text], a:height))
 endfunction
 
 
@@ -305,7 +302,6 @@ endfunction
 
 function! s:save_info() abort
   let w:sclow_saved_lines = [line('w0'), line('w$')]
-  let w:sclow_saved_winheight = winheight(0)
 endfunction
 
 
