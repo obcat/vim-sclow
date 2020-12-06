@@ -7,7 +7,7 @@ function! s:init()
   let s:block_buftypes  = get(g:, 'sclow_block_buftypes', [])
   let s:sbar_text   = get(g:, 'sclow_sbar_text', "\<Space>")
   let s:sbar_zindex = get(g:, 'sclow_sbar_zindex', 20)
-  let s:show_full_length_sbar = get(g:, 'sclow_show_full_length_sbar', 1)
+  let s:hide_full_length = get(g:, 'sclow_hide_full_length', 0)
   hi default link SclowSbar Pmenu
 
   let s:sbar_width = strlen(s:sbar_text)
@@ -164,9 +164,9 @@ function! s:get_masks() abort
   endif
 
 
-  return s:show_full_length_sbar
-    \ ? []
-    \ : [s:mask(l:sbar_total, 'top')]
+  return s:hide_full_length
+    \ ? [s:mask(l:sbar_total, 'top')]
+    \ : []
 endfunction
 
 

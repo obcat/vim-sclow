@@ -91,7 +91,7 @@ are in the window, a full-length scrollbar will be shown.
 If you want to turn this off, you can use:
 
 ```vim
-let g:show_full_length_sbar = 0
+let g:hide_full_length = 1
 ```
 
 See help file for more information.

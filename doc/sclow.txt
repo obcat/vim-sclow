@@ -64,8 +64,8 @@ OPTIONS                                                        *sclow-options*
     let g:sclow_block_buftypes = ['terminal', 'prompt']
 <
 
-*g:sclow_show_full_length_sbar* (default: 1)
-    Determine whether or not to show full-length scrollbar when both the first
+*g:sclow_hide_full_length* (default: 0)
+    Determine whether or not to hide full-length scrollbar when both the first
     and last line of buffer are in the window.
 
 
