@@ -76,6 +76,9 @@ highlight SclowSbar ctermbg=NONE guibg=NONE
 
 :memo: I use [iceberg.vim](https://github.com/cocopon/iceberg.vim) for color scheme.
 
+You can use `g:sclow_sbar_right_offset` to specify the scrollbar offset from
+right border of window. The defaut value is `0`. Negative values are also allowed;
+`-1` may be useful:
 
 ### Blocking
 

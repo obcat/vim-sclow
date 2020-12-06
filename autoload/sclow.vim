@@ -52,8 +52,9 @@ call s:catch_obsolete_and_apologize() " }}}
 function! s:init()
   let s:block_filetypes = get(g:, 'sclow_block_filetypes', [])
   let s:block_buftypes  = get(g:, 'sclow_block_buftypes', [])
-  let s:sbar_text   = get(g:, 'sclow_sbar_text', "\<Space>")
-  let s:sbar_zindex = get(g:, 'sclow_sbar_zindex', 20)
+  let s:sbar_text         = get(g:, 'sclow_sbar_text', "\<Space>")
+  let s:sbar_right_offset = get(g:, 'sclow_sbar_right_offset', 0)
+  let s:sbar_zindex       = get(g:, 'sclow_sbar_zindex', 20)
   let s:hide_full_length = get(g:, 'sclow_hide_full_length', 0)
   hi default link SclowSbar Pmenu
 
@@ -110,10 +111,10 @@ endfunction
 
 function! s:create_sbar() abort
   let [l:line, l:col] = win_screenpos(0)
-  let l:col += winwidth(0) - 1
+  let l:col += winwidth(0) - s:sbar_right_offset - 1
 
   let w:sclow_sbar_id = popup_create(repeat([s:sbar_text], winheight(0)), #{
-    \ pos:'topright',
+    \ pos: 'topright',
     \ line: l:line,
     \ col:  l:col,
     \ mask: s:get_masks(),
@@ -259,7 +260,7 @@ endfunction
 function! s:update_sbar() abort
   let l:pos = popup_getpos(w:sclow_sbar_id)
   let [l:line, l:col] = win_screenpos(0)
-  let l:col += winwidth(0) - 1
+  let l:col += winwidth(0) - s:sbar_right_offset - 1
 
   if [l:pos.line, l:pos.col] != [l:line, l:col]
     call s:move_sbar_base(l:line, l:col)

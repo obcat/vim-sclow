@@ -47,6 +47,14 @@ OPTIONS                                                        *sclow-options*
     One or more characters to be displayed on each line of the scrollbar.
 
 
+*g:sclow_sbar_right_offset* (default: 0)
+    Scrollbar offset from right border of window. Negative values are also
+    allowed; `-1` may be useful.
+
+    NOTE: The scrollbar position may be adjusted so that it does not go out
+    of the Vim window.
+
+
 *g:sclow_sbar_zindex* (default: 20)
     Priority for the scrollbar as |popup-window|. Minimum value is 1, maximum
     value is 32000.
