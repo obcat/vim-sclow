@@ -2,6 +2,53 @@
 " License:    MIT License
 
 
+function! s:catch_obsolete_and_apologize() abort " {{{
+  let l:fmt_fmt_changed   = 'Sorry, the "%s" option''s format has been changed.'
+  let l:fmt_see_help      = 'Please see `:h %s`.'
+  let l:fmt_not_supported = 'Sorry, the "%s" option is no longer supported.'
+  let l:fmt_renamed       = 'Sorry, "%s" is renamed to "%s".'
+
+  let l:name = 'g:sclow_block_filetypes'
+  if exists(l:name) && type({l:name}) == v:t_string
+    let l:msg  = printf(l:fmt_fmt_changed, l:name)
+    let l:msg .= "\<Space>" . printf(l:fmt_see_help, l:name)
+    call s:echoerr(l:msg)
+    unlet {l:name}
+  endif
+
+  let l:name = 'g:sclow_block_bufnames'
+  if exists(l:name)
+    let l:msg = printf(l:fmt_not_supported, l:name)
+    call s:echoerr(l:msg)
+  endif
+
+  let l:name = 'g:sclow_block_buftypes'
+  if exists(l:name) && type({l:name}) == v:t_string
+    let l:msg  = printf(l:fmt_fmt_changed, l:name)
+    let l:msg .= "\<Space>" . printf(l:fmt_see_help, l:name)
+    call s:echoerr(l:msg)
+    unlet {l:name}
+  endif
+
+  let l:name     = 'g:sclow_show_full_length_sbar'
+  let l:new_name = 'g:sclow_hide_full_length'
+  if exists(l:name)
+    let l:msg = printf(l:fmt_renamed, l:name, l:new_name)
+    call s:echoerr(l:msg)
+  endif
+endfunction
+
+
+function! s:echoerr(msg) abort
+  echohl WarningMsg
+  echomsg '[sclow]' a:msg
+  echohl None
+endfunction
+
+
+call s:catch_obsolete_and_apologize() " }}}
+
+
 function! s:init()
   let s:block_filetypes = get(g:, 'sclow_block_filetypes', [])
   let s:block_buftypes  = get(g:, 'sclow_block_buftypes', [])
