@@ -15,7 +15,7 @@ function! s:register_autocmds() abort
   augroup END
 endfunction
 
-command! SclowEnable  call s:register_autocmds()
+command! SclowEnable  call sclow#create() | call s:register_autocmds()
 command! SclowDisable call sclow#delete() | autocmd! sclow-autocmds
 
 call s:register_autocmds()
