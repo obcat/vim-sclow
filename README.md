@@ -78,7 +78,7 @@ highlight SclowSbar ctermbg=NONE guibg=NONE
 
 You can use `g:sclow_sbar_right_offset` to specify the scrollbar offset from
 right border of window. The defaut value is `0`. Negative values are also allowed;
-`-1` may be useful:
+`-1` may be useful.
 
 ### Blocking
 
@@ -105,7 +105,7 @@ a full-length scrollbar will be shown.
 If you want to turn this off, you can use:
 
 ```vim
-let g:hide_full_length = 1
+let g:sclow_hide_full_length = 1
 ```
 
 See help file for more information.
