@@ -61,6 +61,12 @@ function! s:init() "{{{
   hi default link SclowSbar Pmenu
 
   let s:sbar_width = strwidth(s:sbar_text)
+  let s:sbar_basic_options = #{
+    \ pos: 'topright',
+    \ zindex: s:sbar_zindex,
+    \ highlight: 'SclowSbar',
+    \ callback: 's:unlet_sbar_id',
+    \}
 endfunction "}}}
 
 
@@ -72,19 +78,26 @@ function! sclow#create() abort "{{{
   if get(b:, 'sclow_is_blocked')
     return
   endif
-
   if s:is_blocked()
     let b:sclow_is_blocked = 1
     return
   endif
-
   if s:sbar_exists()
     return
   endif
 
-  call s:create_sbar()
+  let [line, col] = s:get_basepos()
+  let winheight = winheight(0)
+  let lnums = s:get_lnums()
+  let options = extend(s:sbar_basic_options, #{
+    \ line: line,
+    \ col:  col,
+    \ mask: s:get_masks(winheight, lnums),
+    \ })
 
-  call s:save_lines()
+  " Create scrollbar
+  let s:sbar_id = popup_create([s:sbar_text]->repeat(winheight), options)
+  let s:savelnums = lnums
 endfunction "}}}
 
 
@@ -94,9 +107,23 @@ function! sclow#update() abort "{{{
     return
   endif
 
-  call s:update_sbar()
+  let pos = popup_getpos(s:sbar_id)
+  let [line, col] = s:get_basepos()
+  if [pos.line, pos.col] != [line, col]
+    call s:move_base(line, col)
+  endif
 
-  call s:save_lines()
+  let baseheight = winheight(s:sbar_id)
+  let winheight  = winheight(0)
+  if baseheight != winheight
+    call s:update_baseheight(winheight)
+  endif
+
+  let lnums = s:get_lnums()
+  if lnums != s:savelnums
+    call s:update_masks(winheight, lnums)
+  endif
+  let s:savelnums = lnums
 endfunction "}}}
 
 
@@ -108,51 +135,9 @@ function! sclow#delete() abort "{{{
   endif
 
   if s:sbar_exists()
-    call s:delete_sbar()
+    " Delete scrollbar
+    call popup_close(s:sbar_id)
   endif
-endfunction "}}}
-
-
-function! s:create_sbar() abort "{{{
-  let [line, col] = win_screenpos(0)
-  let col += winwidth(0) - s:sbar_right_offset - 1
-
-  let s:sbar_id = popup_create(repeat([s:sbar_text], winheight(0)), #{
-    \ pos: 'topright',
-    \ line: line,
-    \ col:  col,
-    \ mask: s:get_masks(),
-    \ zindex: s:sbar_zindex,
-    \ highlight: 'SclowSbar',
-    \ callback: 's:unlet_sbar_id',
-    \})
-endfunction "}}}
-
-
-function! s:update_sbar() abort "{{{
-  let pos = popup_getpos(s:sbar_id)
-  let [line, col] = win_screenpos(0)
-  let col += winwidth(0) - s:sbar_right_offset - 1
-
-  if [pos.line, pos.col] != [line, col]
-    call s:move_base(line, col)
-  endif
-
-  let winheight  = winheight(0)
-  let baseheight = winheight(s:sbar_id)
-
-  if baseheight != winheight
-    call s:update_baseheight(winheight)
-  endif
-
-  if s:scrolled()
-    call s:update_masks()
-  endif
-endfunction "}}}
-
-
-function! s:delete_sbar() abort "{{{
-  call popup_close(s:sbar_id)
 endfunction "}}}
 
 
@@ -161,15 +146,29 @@ function! s:move_base(line, col) abort "{{{
 endfunction "}}}
 
 
-function! s:update_masks() abort "{{{
-  call popup_setoptions(s:sbar_id, #{
-    \ mask: s:get_masks(),
-    \ })
+function! s:update_baseheight(height) abort "{{{
+  call popup_settext(s:sbar_id, [s:sbar_text]->repeat(a:height))
 endfunction "}}}
 
 
-function! s:update_baseheight(height) abort "{{{
-  call popup_settext(s:sbar_id, repeat([s:sbar_text], a:height))
+function! s:update_masks(winheight, lnums) abort "{{{
+  call popup_setoptions(s:sbar_id, #{
+   \ mask: s:get_masks(a:winheight, a:lnums),
+   \ })
+endfunction "}}}
+
+
+" Return the screen position at which topright corner of base of scrollbar
+" should be located.
+function! s:get_basepos() abort "{{{
+  let [line, col] = win_screenpos(0)
+  let col += winwidth(0) - s:sbar_right_offset - 1
+  return [line, col]
+endfunction "}}}
+
+
+function! s:get_lnums() abort "{{{
+  return #{w0: line('w0'), wS: line('w$'), S: line('$')}
 endfunction "}}}
 
 
@@ -186,16 +185,6 @@ endfunction "}}}
 
 function! s:unlet_sbar_id(id, result) abort "{{{
   unlet s:sbar_id
-endfunction "}}}
-
-
-function! s:scrolled() abort "{{{
-  return s:saved_lines != [line('w0'), line('w$')]
-endfunction "}}}
-
-
-function! s:save_lines() abort "{{{
-  let s:saved_lines = [line('w0'), line('w$')]
 endfunction "}}}
 
 
@@ -220,10 +209,10 @@ endfunction "}}}
 "   * Gripper length is constant.
 "   * Padding top is not 0 if buffer's first line is not in the window.
 "   * Padding bottom is not 0 if buffer's last line is not in the window.
-function! s:get_masks() abort "{{{
-  let PTOP   = line('w0') - 1
-  let HEIGHT = winheight(0)
-  let PBOT   = line('$') - line('w$')
+function! s:get_masks(winheight, lnums) abort "{{{
+  let PTOP   = a:lnums.w0 - 1          " = line('w0') - 1
+  let HEIGHT = a:winheight             " = winheight(0)
+  let PBOT   = a:lnums.S - a:lnums.wS  " = line('$') - line('w$')
   let total = HEIGHT
 
   if HEIGHT <= 2
@@ -243,7 +232,6 @@ function! s:get_masks() abort "{{{
         let height -= 1
       endif
     endif
-
     if ptop + height == total
       let ptop -= 1
     endif
