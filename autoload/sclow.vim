@@ -88,12 +88,6 @@ function! sclow#create() abort "{{{
 endfunction "}}}
 
 
-function! s:is_blocked() abort "{{{
-  return index(s:block_filetypes, &l:filetype) >= 0
-    \ || index(s:block_buftypes,  &l:buftype)  >= 0
-endfunction "}}}
-
-
 " This function is called on CursorMoved, CursorMovedI, and CursorHold
 function! sclow#update() abort "{{{
   if !s:sbar_exists()
@@ -106,8 +100,16 @@ function! sclow#update() abort "{{{
 endfunction "}}}
 
 
-function! s:sbar_exists() abort "{{{
-  return exists('w:sclow_sbar_id')
+" This function is called on BufLeave and WinLeave
+function! sclow#delete() abort "{{{
+  " Avoid E994 (cf. https://github.com/obcat/vim-hitspop/issues/5)
+  if win_gettype() == 'popup'
+    return
+  endif
+
+  if s:sbar_exists()
+    call s:delete_sbar()
+  endif
 endfunction "}}}
 
 
@@ -124,6 +126,76 @@ function! s:create_sbar() abort "{{{
     \ highlight: 'SclowSbar',
     \ callback: 's:unlet_sbar_id',
     \})
+endfunction "}}}
+
+
+function! s:update_sbar() abort "{{{
+  let l:pos = popup_getpos(w:sclow_sbar_id)
+  let [l:line, l:col] = win_screenpos(0)
+  let l:col += winwidth(0) - s:sbar_right_offset - 1
+
+  if [l:pos.line, l:pos.col] != [l:line, l:col]
+    call s:move_sbar_base(l:line, l:col)
+  endif
+
+  let l:win_height  = winheight(0)
+  let l:base_height = winheight(w:sclow_sbar_id)
+
+  if l:base_height != l:win_height
+    call s:update_base_height(l:win_height)
+  endif
+
+  if s:scrolled()
+    call s:update_sbar_masks()
+  endif
+endfunction "}}}
+
+
+function! s:delete_sbar() abort "{{{
+  call popup_close(w:sclow_sbar_id)
+endfunction "}}}
+
+
+function! s:move_sbar_base(line, col) abort "{{{
+  call popup_move(w:sclow_sbar_id, #{line: a:line, col: a:col})
+endfunction "}}}
+
+
+function! s:update_sbar_masks() abort "{{{
+  call popup_setoptions(w:sclow_sbar_id, #{
+    \ mask: s:get_masks(),
+    \ })
+endfunction "}}}
+
+
+function! s:update_base_height(height) abort "{{{
+  call popup_settext(w:sclow_sbar_id, repeat([s:sbar_text], a:height))
+endfunction "}}}
+
+
+function! s:is_blocked() abort "{{{
+  return index(s:block_filetypes, &l:filetype) >= 0
+    \ || index(s:block_buftypes,  &l:buftype)  >= 0
+endfunction "}}}
+
+
+function! s:sbar_exists() abort "{{{
+  return exists('w:sclow_sbar_id')
+endfunction "}}}
+
+
+function! s:unlet_sbar_id(id, result) abort "{{{
+  unlet w:sclow_sbar_id
+endfunction "}}}
+
+
+function! s:scrolled() abort "{{{
+  return w:sclow_saved_lines != [line('w0'), line('w$')]
+endfunction "}}}
+
+
+function! s:save_info() abort "{{{
+  let w:sclow_saved_lines = [line('w0'), line('w$')]
 endfunction "}}}
 
 
@@ -251,76 +323,4 @@ function! s:bufheight() abort "{{{
   let l:line = winline()
   keepjumps call setpos('.', l:save_curpos)
   return l:line
-endfunction "}}}
-
-
-function! s:unlet_sbar_id(id, result) abort "{{{
-  unlet w:sclow_sbar_id
-endfunction "}}}
-
-
-function! s:update_sbar() abort "{{{
-  let l:pos = popup_getpos(w:sclow_sbar_id)
-  let [l:line, l:col] = win_screenpos(0)
-  let l:col += winwidth(0) - s:sbar_right_offset - 1
-
-  if [l:pos.line, l:pos.col] != [l:line, l:col]
-    call s:move_sbar_base(l:line, l:col)
-  endif
-
-  let l:win_height  = winheight(0)
-  let l:base_height = winheight(w:sclow_sbar_id)
-
-  if l:base_height != l:win_height
-    call s:update_base_height(l:win_height)
-  endif
-
-  if s:scrolled()
-    call s:update_sbar_masks()
-  endif
-endfunction "}}}
-
-
-function! s:move_sbar_base(line, col) abort "{{{
-  call popup_move(w:sclow_sbar_id, #{line: a:line, col: a:col})
-endfunction "}}}
-
-
-function! s:update_base_height(height) abort "{{{
-  call popup_settext(w:sclow_sbar_id, repeat([s:sbar_text], a:height))
-endfunction "}}}
-
-
-function! s:scrolled() abort "{{{
-  return w:sclow_saved_lines != [line('w0'), line('w$')]
-endfunction "}}}
-
-
-function! s:update_sbar_masks() abort "{{{
-  call popup_setoptions(w:sclow_sbar_id, #{
-    \ mask: s:get_masks(),
-    \ })
-endfunction "}}}
-
-
-function! s:save_info() abort "{{{
-  let w:sclow_saved_lines = [line('w0'), line('w$')]
-endfunction "}}}
-
-
-" This function is called on BufLeave and WinLeave
-function! sclow#delete() abort "{{{
-  " Avoid E994 (cf. https://github.com/obcat/vim-hitspop/issues/5)
-  if win_gettype() == 'popup'
-    return
-  endif
-
-  if s:sbar_exists()
-    call s:delete_sbar()
-  endif
-endfunction "}}}
-
-
-function! s:delete_sbar() abort "{{{
-  call popup_close(w:sclow_sbar_id)
 endfunction "}}}
