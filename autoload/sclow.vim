@@ -323,3 +323,9 @@ function! s:bufheight() abort "{{{
   keepjumps call setpos('.', savecurpos)
   return line
 endfunction "}}}
+
+
+" API function to get scrollbar id.
+function! sclow#getsbarid() abort "{{{
+  return get(s:, 'sbar_id', '')
+endfunction "}}}
