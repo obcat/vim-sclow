@@ -3,30 +3,30 @@
 
 
 " SYAZAI {{{
-function! s:catch_obsolete_and_apologize() abort "{{{
-  let fmt_fmt_changed   = 'Sorry, the "%s" option''s format has been changed.'
-  let fmt_see_help      = 'Please see `:h %s`.'
-  let fmt_not_supported = 'Sorry, the "%s" option is no longer supported.'
+function! s:sorry() abort "{{{
+  let fmt_fmtchanged   = 'Sorry, the "%s" option''s format has been changed.'
+  let fmt_seehelp      = 'Please see `:h %s`.'
+  let fmt_notsupported = 'Sorry, the "%s" option is no longer supported.'
   let fmt_renamed       = 'Sorry, "%s" is renamed to "%s".'
 
   let name = 'g:sclow_block_filetypes'
   if exists(name) && type({name}) == v:t_string
-    let msg  = printf(fmt_fmt_changed, name)
-    let msg .= "\<Space>" . printf(fmt_see_help, name)
+    let msg  = printf(fmt_fmtchanged, name)
+    let msg .= "\<Space>" . printf(fmt_seehelp, name)
     call s:echoerr(msg)
     unlet {name}
   endif
 
   let name = 'g:sclow_block_bufnames'
   if exists(name)
-    let msg = printf(fmt_not_supported, name)
+    let msg = printf(fmt_notsupported, name)
     call s:echoerr(msg)
   endif
 
   let name = 'g:sclow_block_buftypes'
   if exists(name) && type({name}) == v:t_string
-    let msg  = printf(fmt_fmt_changed, name)
-    let msg .= "\<Space>" . printf(fmt_see_help, name)
+    let msg  = printf(fmt_fmtchanged, name)
+    let msg .= "\<Space>" . printf(fmt_seehelp, name)
     call s:echoerr(msg)
     unlet {name}
   endif
@@ -47,7 +47,7 @@ function! s:echoerr(msg) abort "{{{
 endfunction "}}}
 
 
-call s:catch_obsolete_and_apologize()
+call s:sorry()
 "}}}
 
 
@@ -84,7 +84,7 @@ function! sclow#create() abort "{{{
 
   call s:create_sbar()
 
-  call s:save_info()
+  call s:save_lines()
 endfunction "}}}
 
 
@@ -96,7 +96,7 @@ function! sclow#update() abort "{{{
 
   call s:update_sbar()
 
-  call s:save_info()
+  call s:save_lines()
 endfunction "}}}
 
 
@@ -135,18 +135,18 @@ function! s:update_sbar() abort "{{{
   let col += winwidth(0) - s:sbar_right_offset - 1
 
   if [pos.line, pos.col] != [line, col]
-    call s:move_sbar_base(line, col)
+    call s:move_base(line, col)
   endif
 
-  let win_height  = winheight(0)
-  let base_height = winheight(w:sclow_sbar_id)
+  let winheight  = winheight(0)
+  let baseheight = winheight(w:sclow_sbar_id)
 
-  if base_height != win_height
-    call s:update_base_height(win_height)
+  if baseheight != winheight
+    call s:update_baseheight(winheight)
   endif
 
   if s:scrolled()
-    call s:update_sbar_masks()
+    call s:update_masks()
   endif
 endfunction "}}}
 
@@ -156,19 +156,19 @@ function! s:delete_sbar() abort "{{{
 endfunction "}}}
 
 
-function! s:move_sbar_base(line, col) abort "{{{
+function! s:move_base(line, col) abort "{{{
   call popup_move(w:sclow_sbar_id, #{line: a:line, col: a:col})
 endfunction "}}}
 
 
-function! s:update_sbar_masks() abort "{{{
+function! s:update_masks() abort "{{{
   call popup_setoptions(w:sclow_sbar_id, #{
     \ mask: s:get_masks(),
     \ })
 endfunction "}}}
 
 
-function! s:update_base_height(height) abort "{{{
+function! s:update_baseheight(height) abort "{{{
   call popup_settext(w:sclow_sbar_id, repeat([s:sbar_text], a:height))
 endfunction "}}}
 
@@ -194,24 +194,24 @@ function! s:scrolled() abort "{{{
 endfunction "}}}
 
 
-function! s:save_info() abort "{{{
+function! s:save_lines() abort "{{{
   let w:sclow_saved_lines = [line('w0'), line('w$')]
 endfunction "}}}
 
 
 " Return popup masks. See `:h |popup-mask|`.
 " +--------------------+
-" |                    | <--+                   <---+
-" |                    |    | mask top (sbar_ptop)  |
-" |                    | <--+                       |
-" |                   || <--+                       |
-" |                   ||    | gripper (sbar_height) | base (sbar_total)
-" |       window      || <--+                       |
-" |                    | <--+                       |
-" |                    |    |                       |
-" |                    |    | mask bot (sbar_pbot)  |
-" |                    |    |                       |
-" |                    | <--+                   <---+
+" |                    | <--+               <---+
+" |                    |    | Mask top (ptop)   |
+" |                    | <--+                   |
+" |                   || <--+                   |
+" |                   ||    | Gripper (height)  | Base (total)
+" |       window      || <--+                   |
+" |                    | <--+                   |
+" |                    |    |                   |
+" |                    |    | Mask bot (pbot)   |
+" |                    |    |                   |
+" |                    | <--+               <---+
 " +--------------------+
 " NOTE: ptop and pbot stand for padding top and padding bottom respectively.
 "
@@ -221,73 +221,72 @@ endfunction "}}}
 "   * Padding top is not 0 if buffer's first line is not in the window.
 "   * Padding bottom is not 0 if buffer's last line is not in the window.
 function! s:get_masks() abort "{{{
-  let ptop   = line('w0') - 1
-  let height = winheight(0)
-  let pbot   = line('$') - line('w$')
-  let sbar_total = height
+  let PTOP   = line('w0') - 1
+  let HEIGHT = winheight(0)
+  let PBOT   = line('$') - line('w$')
+  let total = HEIGHT
 
-  if sbar_total <= 2
+  if HEIGHT <= 2
     " Cannot meet all requirements. Mask all.
-    return [s:mask(sbar_total, 'top')]
+    return [s:mask(total, 'top')]
   endif
 
-  if ptop && pbot "{{{
-    let total = ptop + height + pbot
-    let scale = 1.0 * sbar_total / total
-    let sbar_ptop   = float2nr(ptop * scale)
-    let sbar_height = float2nr(ceil(height * scale))
+  if PTOP && PBOT "{{{
+    let TOTAL = PTOP + HEIGHT + PBOT
+    let scale = 1.0 * total / TOTAL
+    let ptop   = float2nr(PTOP * scale)
+    let height = float2nr(ceil(HEIGHT * scale))
 
-    if !sbar_ptop
-      let sbar_ptop = 1
-
-      if sbar_ptop + sbar_height == sbar_total + 1
-        let sbar_height -= 1
+    if !ptop
+      let ptop = 1
+      if ptop + height == total + 1
+        let height -= 1
       endif
     endif
 
-    if sbar_ptop + sbar_height == sbar_total
-      let sbar_ptop -= 1
+    if ptop + height == total
+      let ptop -= 1
     endif
 
-    let sbar_pbot = sbar_total - (sbar_ptop + sbar_height)
+    let pbot = total - (ptop + height)
 
     return [
-      \ s:mask(sbar_ptop, 'top'),
-      \ s:mask(sbar_pbot, 'bot'),
+      \ s:mask(ptop, 'top'),
+      \ s:mask(pbot, 'bot'),
       \ ]
   endif "}}}
 
 
-  if pbot "{{{
-    let total = height + pbot
-    let scale = 1.0 * sbar_total / total
-    let sbar_ptop   = float2nr(ptop * scale)
-    let sbar_height = float2nr(ceil(height * scale))
-    let sbar_pbot   = sbar_total - (sbar_ptop + sbar_height)
+  if PBOT "{{{
+    let TOTAL = HEIGHT + PBOT
+    let scale = 1.0 * total / TOTAL
+    let ptop   = float2nr(PTOP * scale)
+    let height = float2nr(ceil(HEIGHT * scale))
+    let pbot   = total - (ptop + height)
 
-    if !sbar_pbot
-      let sbar_pbot = 1
+    if !pbot
+      let pbot = 1
     endif
 
-    return [s:mask(sbar_pbot, 'bot')]
+    return [s:mask(pbot, 'bot')]
   endif "}}}
 
 
-  if ptop "{{{
-    let total = ptop + s:bufheight()
-    let scale = 1.0 * sbar_total / total
-    let sbar_ptop = float2nr(ptop * scale)
+  if PTOP "{{{
+    let TOTAL = PTOP + s:bufheight()
+    let scale = 1.0 * total / TOTAL
+    let ptop = float2nr(PTOP * scale)
 
-    if !sbar_ptop
-      let sbar_ptop = 1
+    if !ptop
+      let ptop = 1
     endif
 
-    return [s:mask(sbar_ptop, 'top')]
+    return [s:mask(ptop, 'top')]
   endif "}}}
 
 
   return s:hide_full_length
-    \ ? [s:mask(sbar_total, 'top')]
+    \ ? [s:mask(total, 'top')]
     \ : []
 endfunction "}}}
 
@@ -305,12 +304,12 @@ endfunction "}}}
 " +--------------------+
 " |.....               | <--+
 " |...                 |    |
-" |.........           |    | returns this height
+" |.........           |    | Returns this height
 " |....                |    |
 " |.............       | <--+
 " |~                   | <--+
 " |~                   |    |
-" |~                   |    | end of buffer
+" |~                   |    | End of buffer
 " |~                   |    |
 " |~                   |    |
 " |~                   | <--+
@@ -318,9 +317,9 @@ endfunction "}}}
 " NOTE: `line('w$') - line('w0') + 1` is not equal to this height when there are
 " foldings or wrapped lines in the window.
 function! s:bufheight() abort "{{{
-  let save_curpos = getcurpos()
+  let savecurpos = getcurpos()
   keepjumps normal! G
   let line = winline()
-  keepjumps call setpos('.', save_curpos)
+  keepjumps call setpos('.', savecurpos)
   return line
 endfunction "}}}
