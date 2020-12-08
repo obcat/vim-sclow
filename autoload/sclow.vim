@@ -61,7 +61,7 @@ function! s:init() "{{{
   hi default link SclowSbar Pmenu
 
   let s:sbar_width = strwidth(s:sbar_text)
-  let s:sbar_basic_options = #{
+  let s:sbar_static_options = #{
     \ pos: 'topright',
     \ zindex: s:sbar_zindex,
     \ highlight: 'SclowSbar',
@@ -89,7 +89,7 @@ function! sclow#create() abort "{{{
   let [line, col] = s:get_basepos()
   let winheight = winheight(0)
   let lnums = s:get_lnums()
-  let options = extend(s:sbar_basic_options, #{
+  let options = extend(s:sbar_static_options, #{
     \ line: line,
     \ col:  col,
     \ mask: s:get_masks(winheight, lnums),
