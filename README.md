@@ -7,7 +7,7 @@ Text-based scrollbar for Vim.
 
 ## Installation
 
-Requires Vim compiled with +popupwin feature (Neovim is not supported).
+Requires Vim compiled with `+popupwin` feature (Neovim is not supported).
 
 If you use [vim-plug](https://github.com/junegunn/vim-plug), add the following
 line to your vimrc:
@@ -21,22 +21,22 @@ You can use any other plugin manager.
 
 ## Usage
 
-No configuration is required. Scrollbar is automaticaly shown in the current
-window.
+No settings are required. A scrollbar will automatically appear on the right
+edge of the current window.
 
 
-### When will scrollbar's position be updated?
+### Tip
 
-When you scroll with cursor moves, the scrollbar's position is updated
+As you **move the cursor** and scroll, the scrollbar's position will be updated
 immediately.
 
-On the other hand, scrolling without cursor moves (you can do this with `<C-e>`
-or `<C-y>`), the position will be updated after the time specified with
-`updatetime` option.
+On the other hand, if you scroll **without moving the cursor** (you can do this
+with `<C-e>` or `<C-y>` etc.), the scrollbar's position will be updated after
+the time specified with the `updatetime` option.
 
-The default value of `updatetime` option is `4000`, i.e. 4 seconds. If you want
-to update the scrollbar's position as soon as possible in the latter situation,
-reduce the value of this option. I suggest around 100ms:
+The default value of `updatetime` is `4000`, i.e. 4 seconds. If you want to
+update the scrollbar's position as soon as possible, reduce the value of this
+option. I suggest around 100ms:
 
 ```vim
 set updatetime=100
@@ -74,15 +74,16 @@ let g:sclow_sbar_text = '👾👾'
 highlight SclowSbar ctermbg=NONE guibg=NONE
 ```
 
-:memo: I use [iceberg.vim](https://github.com/cocopon/iceberg.vim) for color scheme.
+📝 I use [iceberg.vim](https://github.com/cocopon/iceberg.vim) for color scheme.
 
-You can use `g:sclow_sbar_right_offset` to specify the scrollbar offset from
-right border of window. The defaut value is `0`. Negative values are also allowed;
-`-1` may be useful.
+You can also customize the offset of the scrollbar from the right border of the
+window with `g:sclow_bar_right_offset` (default: `0`). Setting this to `-1`
+helps to prevent the scrollbar from hiding the rightmost characters of the
+window.
 
 ### Blocking
 
-If you don't want to see the scrollbar in a specific buffer, you can use:
+To disable scrollbar in a specific buffer, you can use:
 
 * `g:sclow_block_filetypes` (default: `[]`)
 * `g:sclow_block_buftypes` (default: `[]`)
@@ -95,14 +96,14 @@ let g:sclow_block_buftypes = ['terminal', 'prompt']
 ```
 
 
-### Misc
+### Hiding
 
 By default, when both the first and last line of the buffer are in the window,
 a full-length scrollbar will be shown.
 
 ![full-length sbar](https://user-images.githubusercontent.com/64692680/100746502-22aa8680-3424-11eb-9bc3-72d54295a36c.png)
 
-If you want to turn this off, you can use:
+If you want to hide this, use the following:
 
 ```vim
 let g:sclow_hide_full_length = 1

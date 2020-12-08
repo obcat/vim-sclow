@@ -20,24 +20,25 @@ CONTENTS
 ==============================================================================
 INTRO                                                            *sclow-intro*
 
-*Sclow* is a Vim plugin which shows scrollbar in the current window.
+*Sclow* is a Vim plugin which shows a scrollbar in the current window.
 
 
 ==============================================================================
 COMMANDS                                                      *sclow-commands*
 
 *:SclowEnable*
-    Activate |Sclow|.
+    Enable |Sclow| and create a scrollbar in the current window. This is used
+    to re-enable |Sclow| which has been disabled by |:SclowDisable|.
 
 *:SclowDisable*
-    Deactivate |Sclow|.
+    Disable |Sclow| and delete the scrollbar.
 
 
 ==============================================================================
 HIGHLIGHTS                                                  *sclow-highlights*
 
 SclowSbar (default: links to |hl-Pmenu|)                        *hl-SclowSbar*
-    Highlight group for scrollbar which |Sclow| generates.
+    Highlight group for scrollbar which |Sclow| creates.
 
 
 ==============================================================================
@@ -48,8 +49,9 @@ OPTIONS                                                        *sclow-options*
 
 
 *g:sclow_sbar_right_offset* (default: 0)
-    Scrollbar offset from right border of window. Negative values are also
-    allowed; `-1` may be useful.
+    Specify the offset of the scrollbar from the right border of the window.
+    Setting this to `-1` helps to prevent the scrollbar from hiding the
+    rightmost characters of the window.
 
     NOTE: The scrollbar position may be adjusted so that it does not go out
     of the Vim window.
@@ -57,24 +59,25 @@ OPTIONS                                                        *sclow-options*
 
 *g:sclow_sbar_zindex* (default: 20)
     Priority for the scrollbar as |popup-window|. Minimum value is 1, maximum
-    value is 32000.
+    value is 32000. If this value is less than the zindex of another popup
+    window, the scrollbar will be coverd by it, and vice versa.
 
 
 *g:sclow_block_filetypes* (default: [])
-    List of filetypes that do not show the scrollbar. Example:
+    List of filetypes that do not show scrollbar. Example:
 >
     let g:sclow_block_filetypes = ['netrw', 'nerdtree']
 <
 
 *g:sclow_block_buftypes* (default: [])
-    List of buftypes (see 'buftype') that do not show the scrollbar. Example:
+    List of buftypes (see 'buftype') that do not show scrollbar. Example:
 >
     let g:sclow_block_buftypes = ['terminal', 'prompt']
 <
 
 *g:sclow_hide_full_length* (default: 0)
-    Determine whether or not to hide full-length scrollbar when both the first
-    and last line of buffer are in the window.
+    Determine whether or not to hide a full-length scrollbar when both the
+    first and last line of buffer are in the window.
 
 
 ==============================================================================
