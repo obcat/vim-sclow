@@ -4,38 +4,38 @@
 
 " SYAZAI {{{
 function! s:catch_obsolete_and_apologize() abort "{{{
-  let l:fmt_fmt_changed   = 'Sorry, the "%s" option''s format has been changed.'
-  let l:fmt_see_help      = 'Please see `:h %s`.'
-  let l:fmt_not_supported = 'Sorry, the "%s" option is no longer supported.'
-  let l:fmt_renamed       = 'Sorry, "%s" is renamed to "%s".'
+  let fmt_fmt_changed   = 'Sorry, the "%s" option''s format has been changed.'
+  let fmt_see_help      = 'Please see `:h %s`.'
+  let fmt_not_supported = 'Sorry, the "%s" option is no longer supported.'
+  let fmt_renamed       = 'Sorry, "%s" is renamed to "%s".'
 
-  let l:name = 'g:sclow_block_filetypes'
-  if exists(l:name) && type({l:name}) == v:t_string
-    let l:msg  = printf(l:fmt_fmt_changed, l:name)
-    let l:msg .= "\<Space>" . printf(l:fmt_see_help, l:name)
-    call s:echoerr(l:msg)
-    unlet {l:name}
+  let name = 'g:sclow_block_filetypes'
+  if exists(name) && type({name}) == v:t_string
+    let msg  = printf(fmt_fmt_changed, name)
+    let msg .= "\<Space>" . printf(fmt_see_help, name)
+    call s:echoerr(msg)
+    unlet {name}
   endif
 
-  let l:name = 'g:sclow_block_bufnames'
-  if exists(l:name)
-    let l:msg = printf(l:fmt_not_supported, l:name)
-    call s:echoerr(l:msg)
+  let name = 'g:sclow_block_bufnames'
+  if exists(name)
+    let msg = printf(fmt_not_supported, name)
+    call s:echoerr(msg)
   endif
 
-  let l:name = 'g:sclow_block_buftypes'
-  if exists(l:name) && type({l:name}) == v:t_string
-    let l:msg  = printf(l:fmt_fmt_changed, l:name)
-    let l:msg .= "\<Space>" . printf(l:fmt_see_help, l:name)
-    call s:echoerr(l:msg)
-    unlet {l:name}
+  let name = 'g:sclow_block_buftypes'
+  if exists(name) && type({name}) == v:t_string
+    let msg  = printf(fmt_fmt_changed, name)
+    let msg .= "\<Space>" . printf(fmt_see_help, name)
+    call s:echoerr(msg)
+    unlet {name}
   endif
 
-  let l:name     = 'g:sclow_show_full_length_sbar'
-  let l:new_name = 'g:sclow_hide_full_length'
-  if exists(l:name)
-    let l:msg = printf(l:fmt_renamed, l:name, l:new_name)
-    call s:echoerr(l:msg)
+  let name     = 'g:sclow_show_full_length_sbar'
+  let new_name = 'g:sclow_hide_full_length'
+  if exists(name)
+    let msg = printf(fmt_renamed, name, new_name)
+    call s:echoerr(msg)
   endif
 endfunction "}}}
 
@@ -114,13 +114,13 @@ endfunction "}}}
 
 
 function! s:create_sbar() abort "{{{
-  let [l:line, l:col] = win_screenpos(0)
-  let l:col += winwidth(0) - s:sbar_right_offset - 1
+  let [line, col] = win_screenpos(0)
+  let col += winwidth(0) - s:sbar_right_offset - 1
 
   let w:sclow_sbar_id = popup_create(repeat([s:sbar_text], winheight(0)), #{
     \ pos: 'topright',
-    \ line: l:line,
-    \ col:  l:col,
+    \ line: line,
+    \ col:  col,
     \ mask: s:get_masks(),
     \ zindex: s:sbar_zindex,
     \ highlight: 'SclowSbar',
@@ -130,19 +130,19 @@ endfunction "}}}
 
 
 function! s:update_sbar() abort "{{{
-  let l:pos = popup_getpos(w:sclow_sbar_id)
-  let [l:line, l:col] = win_screenpos(0)
-  let l:col += winwidth(0) - s:sbar_right_offset - 1
+  let pos = popup_getpos(w:sclow_sbar_id)
+  let [line, col] = win_screenpos(0)
+  let col += winwidth(0) - s:sbar_right_offset - 1
 
-  if [l:pos.line, l:pos.col] != [l:line, l:col]
-    call s:move_sbar_base(l:line, l:col)
+  if [pos.line, pos.col] != [line, col]
+    call s:move_sbar_base(line, col)
   endif
 
-  let l:win_height  = winheight(0)
-  let l:base_height = winheight(w:sclow_sbar_id)
+  let win_height  = winheight(0)
+  let base_height = winheight(w:sclow_sbar_id)
 
-  if l:base_height != l:win_height
-    call s:update_base_height(l:win_height)
+  if base_height != win_height
+    call s:update_base_height(win_height)
   endif
 
   if s:scrolled()
@@ -174,8 +174,8 @@ endfunction "}}}
 
 
 function! s:is_blocked() abort "{{{
-  return index(s:block_filetypes, &l:filetype) >= 0
-    \ || index(s:block_buftypes,  &l:buftype)  >= 0
+  return index(s:block_filetypes, &filetype) >= 0
+    \ || index(s:block_buftypes,  &buftype)  >= 0
 endfunction "}}}
 
 
@@ -221,73 +221,73 @@ endfunction "}}}
 "   * Padding top is not 0 if buffer's first line is not in the window.
 "   * Padding bottom is not 0 if buffer's last line is not in the window.
 function! s:get_masks() abort "{{{
-  let l:ptop   = line('w0') - 1
-  let l:height = winheight(0)
-  let l:pbot   = line('$') - line('w$')
-  let l:sbar_total = l:height
+  let ptop   = line('w0') - 1
+  let height = winheight(0)
+  let pbot   = line('$') - line('w$')
+  let sbar_total = height
 
-  if l:sbar_total <= 2
+  if sbar_total <= 2
     " Cannot meet all requirements. Mask all.
-    return [s:mask(l:sbar_total, 'top')]
+    return [s:mask(sbar_total, 'top')]
   endif
 
-  if l:ptop && l:pbot "{{{
-    let l:total = l:ptop + l:height + l:pbot
-    let l:scale = 1.0 * l:sbar_total / l:total
-    let l:sbar_ptop   = float2nr(l:ptop * l:scale)
-    let l:sbar_height = float2nr(ceil(l:height * l:scale))
+  if ptop && pbot "{{{
+    let total = ptop + height + pbot
+    let scale = 1.0 * sbar_total / total
+    let sbar_ptop   = float2nr(ptop * scale)
+    let sbar_height = float2nr(ceil(height * scale))
 
-    if !l:sbar_ptop
-      let l:sbar_ptop = 1
+    if !sbar_ptop
+      let sbar_ptop = 1
 
-      if l:sbar_ptop + l:sbar_height == l:sbar_total + 1
-        let l:sbar_height -= 1
+      if sbar_ptop + sbar_height == sbar_total + 1
+        let sbar_height -= 1
       endif
     endif
 
-    if l:sbar_ptop + l:sbar_height == l:sbar_total
-      let l:sbar_ptop -= 1
+    if sbar_ptop + sbar_height == sbar_total
+      let sbar_ptop -= 1
     endif
 
-    let l:sbar_pbot = l:sbar_total - (l:sbar_ptop + l:sbar_height)
+    let sbar_pbot = sbar_total - (sbar_ptop + sbar_height)
 
     return [
-      \ s:mask(l:sbar_ptop, 'top'),
-      \ s:mask(l:sbar_pbot, 'bot'),
+      \ s:mask(sbar_ptop, 'top'),
+      \ s:mask(sbar_pbot, 'bot'),
       \ ]
   endif "}}}
 
 
-  if l:pbot "{{{
-    let l:total = l:height + l:pbot
-    let l:scale = 1.0 * l:sbar_total / l:total
-    let l:sbar_ptop   = float2nr(l:ptop * l:scale)
-    let l:sbar_height = float2nr(ceil(l:height * l:scale))
-    let l:sbar_pbot   = l:sbar_total - (l:sbar_ptop + l:sbar_height)
+  if pbot "{{{
+    let total = height + pbot
+    let scale = 1.0 * sbar_total / total
+    let sbar_ptop   = float2nr(ptop * scale)
+    let sbar_height = float2nr(ceil(height * scale))
+    let sbar_pbot   = sbar_total - (sbar_ptop + sbar_height)
 
-    if !l:sbar_pbot
-      let l:sbar_pbot = 1
+    if !sbar_pbot
+      let sbar_pbot = 1
     endif
 
-    return [s:mask(l:sbar_pbot, 'bot')]
+    return [s:mask(sbar_pbot, 'bot')]
   endif "}}}
 
 
-  if l:ptop "{{{
-    let l:total = l:ptop + s:bufheight()
-    let l:scale = 1.0 * l:sbar_total / l:total
-    let l:sbar_ptop = float2nr(l:ptop * l:scale)
+  if ptop "{{{
+    let total = ptop + s:bufheight()
+    let scale = 1.0 * sbar_total / total
+    let sbar_ptop = float2nr(ptop * scale)
 
-    if !l:sbar_ptop
-      let l:sbar_ptop = 1
+    if !sbar_ptop
+      let sbar_ptop = 1
     endif
 
-    return [s:mask(l:sbar_ptop, 'top')]
+    return [s:mask(sbar_ptop, 'top')]
   endif "}}}
 
 
   return s:hide_full_length
-    \ ? [s:mask(l:sbar_total, 'top')]
+    \ ? [s:mask(sbar_total, 'top')]
     \ : []
 endfunction "}}}
 
@@ -318,9 +318,9 @@ endfunction "}}}
 " NOTE: `line('w$') - line('w0') + 1` is not equal to this height when there are
 " foldings or wrapped lines in the window.
 function! s:bufheight() abort "{{{
-  let l:save_curpos = getcurpos()
+  let save_curpos = getcurpos()
   keepjumps normal! G
-  let l:line = winline()
-  keepjumps call setpos('.', l:save_curpos)
-  return l:line
+  let line = winline()
+  keepjumps call setpos('.', save_curpos)
+  return line
 endfunction "}}}
