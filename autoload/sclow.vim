@@ -117,7 +117,7 @@ function! s:create_sbar() abort "{{{
   let [line, col] = win_screenpos(0)
   let col += winwidth(0) - s:sbar_right_offset - 1
 
-  let w:sclow_sbar_id = popup_create(repeat([s:sbar_text], winheight(0)), #{
+  let s:sbar_id = popup_create(repeat([s:sbar_text], winheight(0)), #{
     \ pos: 'topright',
     \ line: line,
     \ col:  col,
@@ -130,7 +130,7 @@ endfunction "}}}
 
 
 function! s:update_sbar() abort "{{{
-  let pos = popup_getpos(w:sclow_sbar_id)
+  let pos = popup_getpos(s:sbar_id)
   let [line, col] = win_screenpos(0)
   let col += winwidth(0) - s:sbar_right_offset - 1
 
@@ -139,7 +139,7 @@ function! s:update_sbar() abort "{{{
   endif
 
   let winheight  = winheight(0)
-  let baseheight = winheight(w:sclow_sbar_id)
+  let baseheight = winheight(s:sbar_id)
 
   if baseheight != winheight
     call s:update_baseheight(winheight)
@@ -152,24 +152,24 @@ endfunction "}}}
 
 
 function! s:delete_sbar() abort "{{{
-  call popup_close(w:sclow_sbar_id)
+  call popup_close(s:sbar_id)
 endfunction "}}}
 
 
 function! s:move_base(line, col) abort "{{{
-  call popup_move(w:sclow_sbar_id, #{line: a:line, col: a:col})
+  call popup_move(s:sbar_id, #{line: a:line, col: a:col})
 endfunction "}}}
 
 
 function! s:update_masks() abort "{{{
-  call popup_setoptions(w:sclow_sbar_id, #{
+  call popup_setoptions(s:sbar_id, #{
     \ mask: s:get_masks(),
     \ })
 endfunction "}}}
 
 
 function! s:update_baseheight(height) abort "{{{
-  call popup_settext(w:sclow_sbar_id, repeat([s:sbar_text], a:height))
+  call popup_settext(s:sbar_id, repeat([s:sbar_text], a:height))
 endfunction "}}}
 
 
@@ -180,22 +180,22 @@ endfunction "}}}
 
 
 function! s:sbar_exists() abort "{{{
-  return exists('w:sclow_sbar_id')
+  return exists('s:sbar_id')
 endfunction "}}}
 
 
 function! s:unlet_sbar_id(id, result) abort "{{{
-  unlet w:sclow_sbar_id
+  unlet s:sbar_id
 endfunction "}}}
 
 
 function! s:scrolled() abort "{{{
-  return w:sclow_saved_lines != [line('w0'), line('w$')]
+  return s:saved_lines != [line('w0'), line('w$')]
 endfunction "}}}
 
 
 function! s:save_lines() abort "{{{
-  let w:sclow_saved_lines = [line('w0'), line('w$')]
+  let s:saved_lines = [line('w0'), line('w$')]
 endfunction "}}}
 
 
