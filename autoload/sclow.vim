@@ -2,7 +2,8 @@
 " License:    MIT License
 
 
-function! s:catch_obsolete_and_apologize() abort " {{{
+" SYAZAI {{{
+function! s:catch_obsolete_and_apologize() abort "{{{
   let l:fmt_fmt_changed   = 'Sorry, the "%s" option''s format has been changed.'
   let l:fmt_see_help      = 'Please see `:h %s`.'
   let l:fmt_not_supported = 'Sorry, the "%s" option is no longer supported.'
@@ -36,20 +37,21 @@ function! s:catch_obsolete_and_apologize() abort " {{{
     let l:msg = printf(l:fmt_renamed, l:name, l:new_name)
     call s:echoerr(l:msg)
   endif
-endfunction
+endfunction "}}}
 
 
-function! s:echoerr(msg) abort
+function! s:echoerr(msg) abort "{{{
   echohl WarningMsg
   echomsg '[sclow]' a:msg
   echohl None
-endfunction
+endfunction "}}}
 
 
-call s:catch_obsolete_and_apologize() " }}}
+call s:catch_obsolete_and_apologize()
+"}}}
 
 
-function! s:init()
+function! s:init() "{{{
   let s:block_filetypes = get(g:, 'sclow_block_filetypes', [])
   let s:block_buftypes  = get(g:, 'sclow_block_buftypes', [])
   let s:sbar_text         = get(g:, 'sclow_sbar_text', "\<Space>")
@@ -59,14 +61,14 @@ function! s:init()
   hi default link SclowSbar Pmenu
 
   let s:sbar_width = strwidth(s:sbar_text)
-endfunction
+endfunction "}}}
 
 
 call s:init()
 
 
 " This function is called on BufEnter and WinEnter
-function! sclow#create() abort
+function! sclow#create() abort "{{{
   if get(b:, 'sclow_is_blocked')
     return
   endif
@@ -83,17 +85,17 @@ function! sclow#create() abort
   call s:create_sbar()
 
   call s:save_info()
-endfunction
+endfunction "}}}
 
 
-function! s:is_blocked() abort
+function! s:is_blocked() abort "{{{
   return index(s:block_filetypes, &l:filetype) >= 0
     \ || index(s:block_buftypes,  &l:buftype)  >= 0
-endfunction
+endfunction "}}}
 
 
 " This function is called on CursorMoved, CursorMovedI, and CursorHold
-function! sclow#update() abort
+function! sclow#update() abort "{{{
   if !s:sbar_exists()
     return
   endif
@@ -101,15 +103,15 @@ function! sclow#update() abort
   call s:update_sbar()
 
   call s:save_info()
-endfunction
+endfunction "}}}
 
 
-function! s:sbar_exists() abort
+function! s:sbar_exists() abort "{{{
   return exists('w:sclow_sbar_id')
-endfunction
+endfunction "}}}
 
 
-function! s:create_sbar() abort
+function! s:create_sbar() abort "{{{
   let [l:line, l:col] = win_screenpos(0)
   let l:col += winwidth(0) - s:sbar_right_offset - 1
 
@@ -122,7 +124,7 @@ function! s:create_sbar() abort
     \ highlight: 'SclowSbar',
     \ callback: 's:unlet_sbar_id',
     \})
-endfunction
+endfunction "}}}
 
 
 " Return popup masks. See `:h |popup-mask|`.
@@ -146,7 +148,7 @@ endfunction
 "   * Gripper length is constant.
 "   * Padding top is not 0 if buffer's first line is not in the window.
 "   * Padding bottom is not 0 if buffer's last line is not in the window.
-function! s:get_masks() abort
+function! s:get_masks() abort "{{{
   let l:ptop   = line('w0') - 1
   let l:height = winheight(0)
   let l:pbot   = line('$') - line('w$')
@@ -157,7 +159,7 @@ function! s:get_masks() abort
     return [s:mask(l:sbar_total, 'top')]
   endif
 
-  if l:ptop && l:pbot
+  if l:ptop && l:pbot "{{{
     let l:total = l:ptop + l:height + l:pbot
     let l:scale = 1.0 * l:sbar_total / l:total
     let l:sbar_ptop   = float2nr(l:ptop * l:scale)
@@ -181,10 +183,10 @@ function! s:get_masks() abort
       \ s:mask(l:sbar_ptop, 'top'),
       \ s:mask(l:sbar_pbot, 'bot'),
       \ ]
-  endif
+  endif "}}}
 
 
-  if l:pbot
+  if l:pbot "{{{
     let l:total = l:height + l:pbot
     let l:scale = 1.0 * l:sbar_total / l:total
     let l:sbar_ptop   = float2nr(l:ptop * l:scale)
@@ -196,10 +198,10 @@ function! s:get_masks() abort
     endif
 
     return [s:mask(l:sbar_pbot, 'bot')]
-  endif
+  endif "}}}
 
 
-  if l:ptop
+  if l:ptop "{{{
     let l:total = l:ptop + s:bufheight()
     let l:scale = 1.0 * l:sbar_total / l:total
     let l:sbar_ptop = float2nr(l:ptop * l:scale)
@@ -209,21 +211,21 @@ function! s:get_masks() abort
     endif
 
     return [s:mask(l:sbar_ptop, 'top')]
-  endif
+  endif "}}}
 
 
   return s:hide_full_length
     \ ? [s:mask(l:sbar_total, 'top')]
     \ : []
-endfunction
+endfunction "}}}
 
 
 " Return formatted popup mask.
-function! s:mask(height, pos) abort
+function! s:mask(height, pos) abort "{{{
   return a:pos == 'top'
     \ ? [1, s:sbar_width,  1,  a:height]
     \ : [1, s:sbar_width, -a:height, -1]
-endfunction
+endfunction "}}}
 
 
 " If buffer's last line is in the current window, this function returns height
@@ -243,21 +245,21 @@ endfunction
 " +--------------------+
 " NOTE: `line('w$') - line('w0') + 1` is not equal to this height when there are
 " foldings or wrapped lines in the window.
-function! s:bufheight() abort
+function! s:bufheight() abort "{{{
   let l:save_curpos = getcurpos()
   keepjumps normal! G
   let l:line = winline()
   keepjumps call setpos('.', l:save_curpos)
   return l:line
-endfunction
+endfunction "}}}
 
 
-function! s:unlet_sbar_id(id, result) abort
+function! s:unlet_sbar_id(id, result) abort "{{{
   unlet w:sclow_sbar_id
-endfunction
+endfunction "}}}
 
 
-function! s:update_sbar() abort
+function! s:update_sbar() abort "{{{
   let l:pos = popup_getpos(w:sclow_sbar_id)
   let [l:line, l:col] = win_screenpos(0)
   let l:col += winwidth(0) - s:sbar_right_offset - 1
@@ -276,38 +278,38 @@ function! s:update_sbar() abort
   if s:scrolled()
     call s:update_sbar_masks()
   endif
-endfunction
+endfunction "}}}
 
 
-function! s:move_sbar_base(line, col) abort
+function! s:move_sbar_base(line, col) abort "{{{
   call popup_move(w:sclow_sbar_id, #{line: a:line, col: a:col})
-endfunction
+endfunction "}}}
 
 
-function! s:update_base_height(height) abort
+function! s:update_base_height(height) abort "{{{
   call popup_settext(w:sclow_sbar_id, repeat([s:sbar_text], a:height))
-endfunction
+endfunction "}}}
 
 
-function! s:scrolled() abort
+function! s:scrolled() abort "{{{
   return w:sclow_saved_lines != [line('w0'), line('w$')]
-endfunction
+endfunction "}}}
 
 
-function! s:update_sbar_masks() abort
+function! s:update_sbar_masks() abort "{{{
   call popup_setoptions(w:sclow_sbar_id, #{
     \ mask: s:get_masks(),
     \ })
-endfunction
+endfunction "}}}
 
 
-function! s:save_info() abort
+function! s:save_info() abort "{{{
   let w:sclow_saved_lines = [line('w0'), line('w$')]
-endfunction
+endfunction "}}}
 
 
 " This function is called on BufLeave and WinLeave
-function! sclow#delete() abort
+function! sclow#delete() abort "{{{
   " Avoid E994 (cf. https://github.com/obcat/vim-hitspop/issues/5)
   if win_gettype() == 'popup'
     return
@@ -316,9 +318,9 @@ function! sclow#delete() abort
   if s:sbar_exists()
     call s:delete_sbar()
   endif
-endfunction
+endfunction "}}}
 
 
-function! s:delete_sbar() abort
+function! s:delete_sbar() abort "{{{
   call popup_close(w:sclow_sbar_id)
-endfunction
+endfunction "}}}
