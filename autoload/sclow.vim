@@ -75,11 +75,10 @@ call s:init()
 
 " This function is called on BufEnter and WinEnter
 function! sclow#create() abort "{{{
-  if get(b:, 'sclow_is_blocked')
-    return
+  if !exists('b:sclow_is_blocked')
+    let b:sclow_is_blocked = s:is_blocked()
   endif
-  if s:is_blocked()
-    let b:sclow_is_blocked = 1
+  if b:sclow_is_blocked
     return
   endif
   if s:sbar_exists()
@@ -152,9 +151,7 @@ endfunction "}}}
 
 
 function! s:update_masks(winheight, lnums) abort "{{{
-  call popup_setoptions(s:sbar_id, #{
-   \ mask: s:get_masks(a:winheight, a:lnums),
-   \ })
+  call popup_setoptions(s:sbar_id, #{mask: s:get_masks(a:winheight, a:lnums)})
 endfunction "}}}
 
 
