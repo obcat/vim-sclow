@@ -2,55 +2,6 @@
 " License:    MIT License
 
 
-" SYAZAI {{{
-function! s:sorry() abort "{{{
-  let fmt_fmtchanged   = 'Sorry, the "%s" option''s format has been changed.'
-  let fmt_seehelp      = 'Please see `:h %s`.'
-  let fmt_notsupported = 'Sorry, the "%s" option is no longer supported.'
-  let fmt_renamed       = 'Sorry, "%s" is renamed to "%s".'
-
-  let name = 'g:sclow_block_filetypes'
-  if exists(name) && type({name}) == v:t_string
-    let msg  = printf(fmt_fmtchanged, name)
-    let msg .= "\<Space>" . printf(fmt_seehelp, name)
-    call s:echoerr(msg)
-    unlet {name}
-  endif
-
-  let name = 'g:sclow_block_bufnames'
-  if exists(name)
-    let msg = printf(fmt_notsupported, name)
-    call s:echoerr(msg)
-  endif
-
-  let name = 'g:sclow_block_buftypes'
-  if exists(name) && type({name}) == v:t_string
-    let msg  = printf(fmt_fmtchanged, name)
-    let msg .= "\<Space>" . printf(fmt_seehelp, name)
-    call s:echoerr(msg)
-    unlet {name}
-  endif
-
-  let name     = 'g:sclow_show_full_length_sbar'
-  let new_name = 'g:sclow_hide_full_length'
-  if exists(name)
-    let msg = printf(fmt_renamed, name, new_name)
-    call s:echoerr(msg)
-  endif
-endfunction "}}}
-
-
-function! s:echoerr(msg) abort "{{{
-  echohl WarningMsg
-  echomsg '[sclow]' a:msg
-  echohl None
-endfunction "}}}
-
-
-call s:sorry()
-"}}}
-
-
 function! s:init() "{{{
   let s:block_filetypes = get(g:, 'sclow_block_filetypes', [])
   let s:block_buftypes  = get(g:, 'sclow_block_buftypes', [])
