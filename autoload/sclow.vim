@@ -39,7 +39,7 @@ function! sclow#create() abort "{{{
   let [line, col] = s:get_basepos()
   let winheight = winheight(0)
   let lnums = s:get_lnums()
-  let options = extend(s:sbar_static_options, #{
+  let options = extend(deepcopy(s:sbar_static_options), #{
     \ line: line,
     \ col:  col,
     \ mask: s:get_masks(winheight, lnums),
