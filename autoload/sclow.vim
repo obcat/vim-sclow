@@ -57,9 +57,9 @@ function! sclow#update() abort "{{{
     return
   endif
 
-  let pos = popup_getpos(s:sbar_id)
+  let opts = popup_getoptions(s:sbar_id)
   let [line, col] = s:get_basepos()
-  if [pos.line, pos.col] != [line, col]
+  if [opts.line, opts.col] != [line, col]
     call s:move_base(line, col)
   endif
 
