@@ -3,20 +3,19 @@
 
 
 function! s:init() "{{{
-  let s:block_filetypes = get(g:, 'sclow_block_filetypes', [])
-  let s:block_buftypes  = get(g:, 'sclow_block_buftypes', [])
-  let s:sbar_text         = get(g:, 'sclow_sbar_text', "\<Space>")
-  let s:sbar_right_offset = get(g:, 'sclow_sbar_right_offset', 0)
-  let s:sbar_zindex       = get(g:, 'sclow_sbar_zindex', 20)
-  let s:hide_full_length = get(g:, 'sclow_hide_full_length', 0)
-  hi default link SclowSbar Pmenu
+  let g:sclow_block_filetypes = get(g:, 'sclow_block_filetypes', [])
+  let g:sclow_block_buftypes  = get(g:, 'sclow_block_buftypes', [])
+  let g:sclow_sbar_text         = get(g:, 'sclow_sbar_text', "\<Space>")
+  let g:sclow_sbar_right_offset = get(g:, 'sclow_sbar_right_offset', 0)
+  let g:sclow_sbar_zindex       = get(g:, 'sclow_sbar_zindex', 20)
+  let g:sclow_hide_full_length = get(g:, 'sclow_hide_full_length', 0)
+  const s:HLGROUP = 'SclowSbar'
+  exe 'hi default link' s:HLGROUP 'Pmenu'
 
-  let s:sbar_width = strwidth(s:sbar_text)
-  let s:sbar_static_options = #{
+  const s:SBAR_STATIC_OPTIONS = #{
     \ pos: 'topright',
-    \ zindex: s:sbar_zindex,
-    \ highlight: 'SclowSbar',
-    \ callback: 's:unlet_sbar_id',
+    \ highlight: s:HLGROUP,
+    \ callback: {-> s:unlet_sbar_id()},
     \}
 endfunction "}}}
 
@@ -26,27 +25,22 @@ call s:init()
 
 " This function is called on BufEnter and WinEnter
 function! sclow#create() abort "{{{
-  if !exists('b:sclow_is_blocked')
-    let b:sclow_is_blocked = s:is_blocked()
-  endif
-  if b:sclow_is_blocked
-    return
-  endif
-  if s:sbar_exists()
+  if s:is_blocked() || s:sbar_exists()
     return
   endif
 
-  let [line, col] = s:get_basepos()
-  let winheight = winheight(0)
-  let bufheights = s:get_bufheights()
-  let options = extend(deepcopy(s:sbar_static_options), #{
+  const [line, col] = s:get_basepos()
+  const winheight = winheight(0)
+  const bufheights = s:get_bufheights()
+  const options = deepcopy(s:SBAR_STATIC_OPTIONS)->extend(#{
     \ line: line,
     \ col:  col,
+    \ zindex: g:sclow_sbar_zindex,
     \ mask: s:get_masks(winheight, bufheights),
     \ })
 
   " Create scrollbar
-  let s:sbar_id = popup_create([s:sbar_text]->repeat(winheight), options)
+  let s:sbar_id = popup_create([g:sclow_sbar_text]->repeat(winheight), options)
   let s:savebufheights = bufheights
 endfunction "}}}
 
@@ -57,19 +51,19 @@ function! sclow#update() abort "{{{
     return
   endif
 
-  let opts = popup_getoptions(s:sbar_id)
-  let [line, col] = s:get_basepos()
+  const opts = popup_getoptions(s:sbar_id)
+  const [line, col] = s:get_basepos()
   if [opts.line, opts.col] != [line, col]
     call s:move_base(line, col)
   endif
 
-  let baseheight = winheight(s:sbar_id)
-  let winheight  = winheight(0)
+  const baseheight = winheight(s:sbar_id)
+  const winheight  = winheight(0)
   if baseheight != winheight
     call s:update_baseheight(winheight)
   endif
 
-  let bufheights = s:get_bufheights()
+  const bufheights = s:get_bufheights()
   if bufheights != s:savebufheights
     call s:update_masks(winheight, bufheights)
   endif
@@ -80,7 +74,7 @@ endfunction "}}}
 " This function is called on BufLeave and WinLeave
 function! sclow#delete() abort "{{{
   " Avoid E994 (cf. https://github.com/obcat/vim-hitspop/issues/5)
-  if win_gettype() == 'popup'
+  if win_gettype() is# 'popup'
     return
   endif
 
@@ -97,7 +91,7 @@ endfunction "}}}
 
 
 function! s:update_baseheight(height) abort "{{{
-  call popup_settext(s:sbar_id, [s:sbar_text]->repeat(a:height))
+  call popup_settext(s:sbar_id, [g:sclow_sbar_text]->repeat(a:height))
 endfunction "}}}
 
 
@@ -110,14 +104,14 @@ endfunction "}}}
 " should be located.
 function! s:get_basepos() abort "{{{
   let [line, col] = win_screenpos(0)
-  let col += winwidth(0) - s:sbar_right_offset - 1
+  let col += winwidth(0) - g:sclow_sbar_right_offset - 1
   return [line, col]
 endfunction "}}}
 
 
 function! s:is_blocked() abort "{{{
-  return index(s:block_filetypes, &filetype) >= 0
-    \ || index(s:block_buftypes,  &buftype)  >= 0
+  return index(g:sclow_block_filetypes, &filetype) >= 0
+    \ || index(g:sclow_block_buftypes,  &buftype)  >= 0
 endfunction "}}}
 
 
@@ -126,7 +120,7 @@ function! s:sbar_exists() abort "{{{
 endfunction "}}}
 
 
-function! s:unlet_sbar_id(id, result) abort "{{{
+function! s:unlet_sbar_id() abort "{{{
   unlet s:sbar_id
 endfunction "}}}
 
@@ -141,28 +135,28 @@ endfunction "}}}
 " |....                |    |                    |....                |    |
 " |... Visible area    |    |                    |.....               |    |
 " |..   (window)       |    | HEIGHT             |..                  |    |
-" |............        |    |                    |............        | <--+
-" |......              |    |                    +--------------------+
-" |..........          | <--+                    |..........          | <--+
-" +--------------------+                         |.......             |    | HEIGHT
-" |.............       | <--+ PBOT               |....Visible area    |    |
-" |.....               | <--+                    |...  (window)       | <--+ PBOT = 0
-" |~  Invisible area   | <--+               +--> |~                   |
+" |............        |    |                    |............        |    |
+" |......              |    |                    |......              | <--+
+" +--------------------+ <--+                    +--------------------+
+" |.......             | <--+                    |.......             | <--+
+" |.............       |    | PBOT               |.............       |    | HEIGHT
+" |.. Invisible area   | <--+                    |... Visible area    | <--+
+" |~                   | <--+               +--> |~    (window)       |      PBOT = 0
 " |~                   |    | End of buffer |    |~                   |
 " |~                   | <--+               +--> |~                   |
 " +--------------------+                         +--------------------+
 " NOTE: PTOP and PBOT are computed assuming that there are no wraps or
 " foldings in the corresponding areas.
 function! s:get_bufheights() abort "{{{
-  let w0 = line('w0')
-  let wS = line('w$')
-  let S  = line('$')
+  const w0 = line('w0')
+  let   wS = line('w$')
+  const S  = line('$')
   let bufheights = {}
   let bufheights.PTOP = w0 - 1
   let bufheights.PBOT = S - wS
-  let winid = win_getid()
-  let res = foldclosed(wS)
-  if res != -1
+  const winid = win_getid()
+  const res = foldclosed(wS)
+  if res >= 1
     let wS = res
   endif
   let bufheights.HEIGHT = screenpos(winid, wS, 1).row - screenpos(winid, w0, 1).row + 1
@@ -192,13 +186,13 @@ endfunction "}}}
 "   * Padding top is not 0 if buffer's first line is not in the window.
 "   * Padding bottom is not 0 if buffer's last line is not in the window.
 function! s:get_masks(winheight, bufheights) abort "{{{
-  let PTOP   = a:bufheights.PTOP
-  let HEIGHT = a:bufheights.HEIGHT
-  let PBOT   = a:bufheights.PBOT
-  let TOTAL  = PTOP + HEIGHT + PBOT
+  const PTOP   = a:bufheights.PTOP
+  const HEIGHT = a:bufheights.HEIGHT
+  const PBOT   = a:bufheights.PBOT
+  const TOTAL  = PTOP + HEIGHT + PBOT
 
-  let total  = a:winheight
-  let scale  = 1.0 * total / TOTAL
+  const total  = a:winheight
+  const scale  = 1.0 * total / TOTAL
   let ptop   = float2nr(PTOP * scale)
   let height = float2nr(ceil(HEIGHT * scale))
 
@@ -207,8 +201,8 @@ function! s:get_masks(winheight, bufheights) abort "{{{
     return [s:mask(total, 'top')]
   endif
 
-  if PTOP && PBOT "{{{
-    if !ptop
+  if PTOP >= 1 && PBOT >= 1 "{{{
+    if ptop == 0
       let ptop = 1
       if ptop + height == total + 1
         let height -= 1
@@ -227,10 +221,10 @@ function! s:get_masks(winheight, bufheights) abort "{{{
   endif "}}}
 
 
-  if PBOT "{{{
+  if PBOT >= 1 "{{{
     let pbot = total - (ptop + height)
 
-    if !pbot
+    if pbot == 0
       let pbot = 1
     endif
 
@@ -238,8 +232,8 @@ function! s:get_masks(winheight, bufheights) abort "{{{
   endif "}}}
 
 
-  if PTOP "{{{
-    if !ptop
+  if PTOP >= 1 "{{{
+    if ptop == 0
       let ptop = 1
     endif
 
@@ -247,7 +241,7 @@ function! s:get_masks(winheight, bufheights) abort "{{{
   endif "}}}
 
 
-  return s:hide_full_length
+  return g:sclow_hide_full_length
     \ ? [s:mask(total, 'top')]
     \ : []
 endfunction "}}}
@@ -255,9 +249,11 @@ endfunction "}}}
 
 " Return formatted popup mask.
 function! s:mask(height, pos) abort "{{{
-  return a:pos == 'top'
-    \ ? [1, s:sbar_width,  1,  a:height]
-    \ : [1, s:sbar_width, -a:height, -1]
+  if a:pos is# 'top'
+    return [1, strwidth(g:sclow_sbar_text),  1,  a:height]
+  elseif a:pos is# 'bot'
+    return [1, strwidth(g:sclow_sbar_text), -a:height, -1]
+  endif
 endfunction "}}}
 
 
