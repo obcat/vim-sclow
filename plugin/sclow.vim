@@ -6,7 +6,7 @@ if exists('g:loaded_sclow')
 endif
 
 
-function! s:register_autocmds() abort
+function s:register_autocmds() abort
   augroup sclow-autocmds
     autocmd!
     autocmd BufEnter,WinEnter * call sclow#create()
