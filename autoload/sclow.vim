@@ -148,19 +148,39 @@ endfunction "}}}
 " NOTE: PTOP and PBOT are computed assuming that there are no wraps or
 " foldings in the corresponding areas.
 function s:get_bufheights() abort "{{{
-  let w0 = line('w0')
-  let wS = line('w$')
-  let S  = line('$')
   let bufheights = {}
-  let bufheights.PTOP = w0 - 1
-  let bufheights.PBOT = S - wS
-  let winid = win_getid()
-  let res = foldclosed(wS)
-  if res >= 1
-    let wS = res
-  endif
-  let bufheights.HEIGHT = screenpos(winid, wS, 1).row - screenpos(winid, w0, 1).row + 1
+  let bufheights.PTOP = line('w0') - 1
+  let bufheights.PBOT = line('$') - line('w$')
+  let bufheights.HEIGHT = (bufheights.PBOT == 0)
+    \ ? s:bufheight()
+    \ : winheight(0)
   return bufheights
+endfunction "}}}
+
+
+" If buffer's last line is in the current window, this function returns height
+" of the buffer in the window.
+" +--------------------+
+" |.....               | <--+
+" |...                 |    |
+" |.........           |    | Returns this height
+" |....                |    |
+" |.............       | <--+
+" |~                   | <--+
+" |~                   |    |
+" |~                   |    | End of buffer
+" |~                   |    |
+" |~                   |    |
+" |~                   | <--+
+" +--------------------+
+" NOTE: `line('w$') - line('w0') + 1` is not equal to this height when there are
+" foldings or wrapped lines in the window.
+function s:bufheight() abort "{{{
+  let savecurpos = getcurpos()
+  keepjumps normal! G
+  let line = winline()
+  keepjumps call setpos('.', savecurpos)
+  return line
 endfunction "}}}
 
 
