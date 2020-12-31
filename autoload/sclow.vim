@@ -104,6 +104,9 @@ endfunction "}}}
 " should be located.
 function s:get_basepos() abort "{{{
   let [line, col] = win_screenpos(0)
+  if !empty(menu_info('WinBar', 'a'))
+    let line += 1
+  endif
   let col += winwidth(0) - g:sclow_sbar_right_offset - 1
   return [line, col]
 endfunction "}}}
