@@ -179,10 +179,12 @@ endfunction "}}}
 " NOTE: `line('w$') - line('w0') + 1` is not equal to this height when there are
 " foldings or wrapped lines in the window.
 function s:bufheight() abort "{{{
-  let savecurpos = getcurpos()
-  keepjumps normal! G
+  let curpos = getcurpos()
+  let winview = winsaveview()
+  $
   let line = winline()
-  keepjumps call setpos('.', savecurpos)
+  call setpos('.', curpos)
+  call winrestview(winview)
   return line
 endfunction "}}}
 
