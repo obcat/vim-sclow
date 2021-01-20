@@ -1,93 +1,96 @@
-*sclow.txt*  Text-based scrollbar for Vim
+*sclow.txt*	Text-based scrollbar for Vim
 
-                        _____      _,
-                       / ___/_____/ /___ _      __
-                       \__ \/ ___/ / __ \ | /| / /
-                      ___/ / /__/ / /_/ / |/ |/ /
-                     /____/\___/_/\____/,__/,__/
+			   _____      __ `
+			  / ___/_____/ /___ _      __ `
+			  \__ \/ ___/ / __ \ | /| / / `
+			 ___/ / /__/ / /_/ / |/ |/ / `
+			/____/\___/_/\____/|__/|__/ `
 
 
 ==============================================================================
 CONTENTS
 
-    Intro .................................... |sclow-intro|
-    Commands ................................. |sclow-commands|
-    Highlights ............................... |sclow-highlights|
-    Options .................................. |sclow-options|
-    About .................................... |sclow-about|
+	Intro .................................... |sclow-intro|
+	Commands ................................. |sclow-commands|
+	Highlights ............................... |sclow-highlights|
+	Options .................................. |sclow-options|
+	About .................................... |sclow-about|
 
 
 ==============================================================================
-INTRO                                                            *sclow-intro*
+INTRO								*sclow-intro*
 
 *Sclow* is a Vim plugin which shows a scrollbar in the current window.
 
 
 ==============================================================================
-COMMANDS                                                      *sclow-commands*
+COMMANDS						*sclow-commands*
 
 *:SclowEnable*
-    Enable |Sclow| and create a scrollbar in the current window. This is used
-    to re-enable |Sclow| which has been disabled by |:SclowDisable|.
+	Enable |Sclow| and create a scrollbar in the current window.  This is
+	used to re-enable |Sclow| which has been disabled by |:SclowDisable|.
 
 *:SclowDisable*
-    Disable |Sclow| and delete the scrollbar.
+	Disable |Sclow| and delete the scrollbar.
 
 
 ==============================================================================
-HIGHLIGHTS                                                  *sclow-highlights*
+HIGHLIGHTS						*sclow-highlights*
 
-SclowSbar (default: links to |hl-Pmenu|)                        *hl-SclowSbar*
-    Highlight group for scrollbar which |Sclow| creates.
+SclowSbar	(default: links to |hl-Pmenu|)			*hl-SclowSbar*
+	Highlight group for scrollbar that |Sclow| creates.
 
 
 ==============================================================================
-OPTIONS                                                        *sclow-options*
+OPTIONS							*sclow-options*
 
-*g:sclow_sbar_text* (default: "\<Space>")
-    One or more characters to be displayed on each line of the scrollbar.
-
-
-*g:sclow_sbar_right_offset* (default: 0)
-    Specify the offset of the scrollbar from the right border of the window.
-    Setting this to `-1` helps to prevent the scrollbar from hiding the
-    rightmost characters of the window.
-
-    NOTE: The scrollbar position may be adjusted so that it does not go out
-    of the Vim window.
+*g:sclow_sbar_text*		string	(default: "\<Space>")
+	One or more characters to be displayed on each line of the scrollbar.
 
 
-*g:sclow_sbar_zindex* (default: 20)
-    Priority for the scrollbar as |popup-window|. Minimum value is 1, maximum
-    value is 32000. If this value is less than the zindex of another popup
-    window, the scrollbar will be coverd by it, and vice versa.
+*g:sclow_sbar_right_offset*	number	(default: 0)
+	Specify the offset of the scrollbar from the right border of the
+	window.  Setting this to `-1` helps to prevent the scrollbar from
+	hiding the rightmost characters of the window.
+
+	NOTE: The scrollbar position may be adjusted so that it does not go
+	out of the Vim window.
 
 
-*g:sclow_block_filetypes* (default: [])
-    List of filetypes that do not show scrollbar. Example:
+*g:sclow_sbar_zindex*		number	(default: 20)
+	Priority for the scrollbar as |popup-window|.  Minimum value is 1,
+	maximum value is 32000.  If this value is less than the zindex of
+	another popup window, the scrollbar will be coverd by it, and vice
+	versa.
+
+
+*g:sclow_block_filetypes*	list<string>	(default: [])
+	Filetypes that do not show scrollbar.  Example:
 >
-    let g:sclow_block_filetypes = ['netrw', 'nerdtree']
+		let g:sclow_block_filetypes = ['netrw', 'nerdtree']
 <
 
-*g:sclow_block_buftypes* (default: [])
-    List of buftypes (see 'buftype') that do not show scrollbar. Example:
+
+*g:sclow_block_buftypes*	list<string>	(default: [])
+	Buftypes (see 'buftype') that do not show scrollbar.  Example:
 >
-    let g:sclow_block_buftypes = ['terminal', 'prompt']
+		let g:sclow_block_buftypes = ['terminal', 'prompt']
 <
 
-*g:sclow_hide_full_length* (default: 0)
-    Determine whether or not to hide a full-length scrollbar when both the
-    first and last line of buffer are in the window.
+
+*g:sclow_hide_full_length*	boolean	(default: 0)
+	Determine whether or not to hide a full-length scrollbar when both
+	the first and last line of buffer are in the window.
 
 
 ==============================================================================
-ABOUT                                                          *sclow-about*
+ABOUT								*sclow-about*
 
-|Sclow| is developed by obcat and licensed under the MIT License.
-Visit the project page for the latest version:
+|Sclow| is developed by obcat and licensed under the MIT License.  Visit the
+project page for the latest version:
 
-    https://github.com/obcat/vim-sclow
+	https://github.com/obcat/vim-sclow
 
 
 ==============================================================================
-vim:ft=help:norl:ts=4:sw=4:tw=78:
+ vim:tw=78:ts=8:noet:ft=help:norl:
