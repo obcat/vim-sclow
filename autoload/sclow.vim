@@ -9,6 +9,7 @@ function s:init() "{{{
   let g:sclow_sbar_right_offset = get(g:, 'sclow_sbar_right_offset', 0)
   let g:sclow_sbar_zindex       = get(g:, 'sclow_sbar_zindex', 20)
   let g:sclow_hide_full_length = get(g:, 'sclow_hide_full_length', 0)
+  let g:sclow_auto_hide = get(g:, 'sclow_auto_hide', 0)
   let s:HLGROUP = 'SclowSbar'
   exe 'hi default link' s:HLGROUP 'Pmenu'
 
@@ -42,12 +43,19 @@ function sclow#create() abort "{{{
   " Create scrollbar
   let s:sbar_id = popup_create([g:sclow_sbar_text]->repeat(winheight), options)
   let s:savebufheights = bufheights
+  let s:lastlineno = getpos('.')[1]
+  let s:buflines = line('$')
+
+  " Run autohide timer if enabled
+  if g:sclow_auto_hide != 0
+    let s:hidetimer = timer_start(g:sclow_auto_hide, 'sclow#hide')
+  endif
 endfunction "}}}
 
 
-" This function is called on CursorMoved, CursorMovedI, and CursorHold
+" This function is called on CursorMoved, CursorMovedI, TextChanged, TextChangedI
 function sclow#update() abort "{{{
-  if !s:sbar_exists()
+  if !s:sbar_exists() || (getpos('.')[1] == s:lastlineno && line('$') == s:buflines)
     return
   endif
 
@@ -68,6 +76,19 @@ function sclow#update() abort "{{{
     call s:update_masks(winheight, bufheights)
   endif
   let s:savebufheights = bufheights
+
+  let s:lastlineno = getpos('.')[1]
+  let s:buflines = line('$')
+
+  " Run autohide timer if enabled
+  if g:sclow_auto_hide != 0
+    if exists('s:hidetimer')
+      call timer_stop(s:hidetimer)
+    endif
+    let s:hidetimer = timer_start(g:sclow_auto_hide, 'sclow#hide')
+  endif
+
+  call popup_show(s:sbar_id)
 endfunction "}}}
 
 
@@ -81,6 +102,20 @@ function sclow#delete() abort "{{{
   if s:sbar_exists()
     " Delete scrollbar
     call popup_close(s:sbar_id)
+  endif
+endfunction "}}}
+
+
+" This function is called on timer timeout
+function sclow#hide(timer) abort "{{{
+  " Avoid E994 (cf. https://github.com/obcat/vim-hitspop/issues/5)
+  if win_gettype() is# 'popup'
+    return
+  endif
+
+  if s:sbar_exists()
+    " Hide scrollbar
+    call popup_hide(s:sbar_id)
   endif
 endfunction "}}}
 

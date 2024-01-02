@@ -111,6 +111,17 @@ let g:sclow_hide_full_length = 1
 
 See help file for more information.
 
+### Autohiding
+
+By default the scrollbar will be shown on the screen permanently. If this behavior
+is undesirable, it is possible to automatically hide the scrollbar after a predefined
+period of inactivity.
+
+To make scrollbar disappear after 2000ms set:
+
+```vim
+let g:sclow_auto_hide = 2000
+```
 
 ## License
 
