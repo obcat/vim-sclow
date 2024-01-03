@@ -5,12 +5,13 @@ if exists('g:loaded_sclow')
   finish
 endif
 
+let g:sclow_auto_hide = get(g:, 'sclow_auto_hide', 0)
 
 function s:register_autocmds() abort
   augroup sclow-autocmds
     autocmd!
     autocmd BufEnter,WinEnter * call sclow#create()
-    autocmd CursorMoved,CursorMovedI,CursorHold * call sclow#update()
+    autocmd CursorMoved,CursorMovedI,TextChanged,TextChangedI * call sclow#update()
     autocmd BufLeave,WinLeave * call sclow#delete()
   augroup END
 endfunction

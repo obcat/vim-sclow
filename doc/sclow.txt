@@ -83,6 +83,13 @@ OPTIONS							*sclow-options*
 	the first and last line of buffer are in the window.
 
 
+
+*g:sclow_auto_hide*		number	(default: 0)
+	Specify time of inactivity in milliseconds after which scrollbar
+	will disappear until cursor line or buffer length change. 0 disables
+	auto hiding.
+
+
 ==============================================================================
 ABOUT								*sclow-about*
 
