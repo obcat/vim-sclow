@@ -77,7 +77,7 @@ highlight SclowSbar ctermbg=NONE guibg=NONE
 📝 I use [iceberg.vim](https://github.com/cocopon/iceberg.vim) for color scheme.
 
 You can also customize the offset of the scrollbar from the right border of the
-window with `g:sclow_bar_right_offset` (default: `0`). Setting this to `-1`
+window with `g:sclow_sbar_right_offset` (default: `0`). Setting this to `-1`
 helps to prevent the scrollbar from hiding the rightmost characters of the
 window.
 
